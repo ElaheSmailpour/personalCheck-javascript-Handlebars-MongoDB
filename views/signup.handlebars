@@ -1,0 +1,23 @@
+
+    <div class="signup">
+        <form class="signup-content"  method="post" action="/user/signup" >
+
+            <div class="register">
+                <label for="name">Name:</label>
+                <input type="text"  name="name" />
+                <label for="phone">Phone:</label>
+                <input type="text"  name="phone" />
+                <label for="password">password:</label>
+                <input type="password"  name="password" />
+                <label for="password"> Repeat Password:</label>
+                <input type="password"  name="repeatPassword" />
+                <label for="email">Email:</label>
+                <input type="text"  name="email" required />
+            </div>
+            <button type="submit">Regestrieren</button>
+            <p>{{{error}}}</p>
+        </form>
+    </div>
+
+
+
