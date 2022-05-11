@@ -9,12 +9,12 @@ exports.loginUser = async (req, res, next) => {
 	
 	try {
 
-		let user = await userModel.findOne({ username: loginuser.username })
+		let user = await userModel.findOne({ email: loginuser.email })
 		console.log(user);
 
-		if (user === null) {
+		if (!user) {
 		
-		return	res.render("login",{error:'incorrect username'})
+		return	res.render("login",{error:'incorrect email'})
 		}
 
 		let comparePasswort = await bcrypt.compare(loginuser.password, user.password)
@@ -22,16 +22,11 @@ exports.loginUser = async (req, res, next) => {
 		if (comparePasswort) {
 
 			let token = jwt.sign({
-				username: user.username,
+				email: user.email,
 				_id: user._id,
 			}, process.env.JWT,{expiresIn:"1h"})
-			res.status(200).json({
-				message: 'You are log it',
-				token: token,
-				username: user.username,
-				name:user.name
-
-			})
+			res.cookie('Xtoken',token, { maxAge: 900000, httpOnly: true });
+			res.redirect("/home/homeseite")
 		} else {
 			
 			return	res.render("login",{error:'incorrect password'})
@@ -64,7 +59,7 @@ exports.signupUser = async (req, res, next) => {
         let createuser = await userModel.create({ ...newuser, password: passwortGehashed })
 
 
-      res.render("signup");
+      res.redirect("login");
 
     } catch (error) {
         console.log(error)
