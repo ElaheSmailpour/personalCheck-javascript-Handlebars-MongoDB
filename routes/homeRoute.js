@@ -6,7 +6,7 @@ const router = express.Router()
 const {homeForm}=require("../controller/homeController")
 
 
-router.get("/homeseite",homeForm)
+router.get("/",homeForm)
 
 
 

@@ -54,3 +54,7 @@
     font-family: sans-serif;
     width: max-content;
 }
+.calender{
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+}
