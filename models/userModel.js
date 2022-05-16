@@ -3,7 +3,11 @@ const userPersonalSchema = new mongoose.Schema({
   name: String,
   phone: String,
   password:String,
-  email:String
+  email:String,
+  status:{
+    type:String,
+    enum:["inWork","inPause","outWork"]
+  }
  
 
 })

@@ -1,6 +1,11 @@
 <div>
 
+
   <header>
+    <button {{#if startWorkDisabled}} disabled {{/if}} onclick="startWork()">start Work</button>
+    <button {{#if endWordDisabled}} disabled {{/if}}  onclick="endWork()">End Work</button>
+    <button {{#if pauseStartDisabled}} disabled {{/if}}  onclick="pauseStart()">Pause Start</button>
+    <button onclick="PauseEnd()">Pause End</button>
     <nav>
       <ul>
         <li>my profile
@@ -23,3 +28,4 @@
   </div>
 
 </div>
+<script src="/Js/Homescript.js"></script>

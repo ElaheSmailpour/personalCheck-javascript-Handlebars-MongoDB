@@ -27,7 +27,7 @@ exports.loginUser = async (req, res, next) => {
 			// }, process.env.JWT,{expiresIn:"1h"})
 
 			req.session.isLogin = true;
-			req.session.id = user._id;
+			req.session._id = user._id;
 			req.session.cookie.exprire = new Date() + 3600000
 			//	res.cookie('Xtoken',token, { maxAge: 900000, httpOnly: true });
 			res.redirect("/home/homeseite")
@@ -84,6 +84,6 @@ exports.signupForm = async (req, res, next) => {
 
 exports.logoutForm = async (req, res, next) => {
 	req.session.isLogin = false;
-	req.session.id = undefined;
+	req.session._id = undefined;
 	res.redirect("/user/login")
 }
