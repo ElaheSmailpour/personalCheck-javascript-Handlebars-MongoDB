@@ -2,10 +2,6 @@
 
 
   <header>
-    <button {{#if startWorkDisabled}} disabled {{/if}} onclick="startWork()">start Work</button>
-    <button {{#if endWordDisabled}} disabled {{/if}}  onclick="endWork()">End Work</button>
-    <button {{#if pauseStartDisabled}} disabled {{/if}}  onclick="pauseStart()">Pause Start</button>
-    <button onclick="PauseEnd()">Pause End</button>
     <nav>
       <ul>
         <li>my profile
@@ -18,11 +14,51 @@
         </li>
       </ul>
     </nav>
+    <div>
+      <h3>{{username}}</h3>
+    </div>
+    <button {{#if startWorkDisabled}} disabled {{/if}} onclick="startWork()">start Work</button>
+    <button {{#if endWordDisabled}} disabled {{/if}}  onclick="endWork()">End Work</button>
+    <button {{#if pauseStartDisabled}} disabled {{/if}}  onclick="pauseStart()">Pause Start</button>
+    <button onclick="PauseEnd()">Pause End</button>
+    
   </header>
+  <div>
+    <a href="/home?month={{lastMonthNumber}}"><button><</button></a>
+    <a href="/home?month={{nextMonthNumber}}"><button>></button></a>
+    <span>{{currentMonth}}</h6>
+  </div>
   <div class="calender">
-
+    <div class="dayHeader">
+      <h3>mon</h3>
+    </div>
+     <div class="dayHeader">
+      <h3>tue</h3>
+    </div>
+     <div class="dayHeader">
+      <h3>wed</h3>
+    </div>
+     <div class="dayHeader">
+      <h3>thu</h3>
+    </div>
+     <div class="dayHeader">
+      <h3>fri</h3>
+    </div>
+     <div class="dayHeader">
+      <h3>sat</h3>
+    </div>
+     <div class="dayHeader">
+      <h3>sun</h3>
+    </div>
     {{#each days}}
-    <li>{{this}}</li>
+    <div class="dayCell">
+      <h5>
+        {{this.dayWork}}
+      </h5>
+      {{#if this.startTime}}
+    <span>{{this.startTime}}=====> {{this.endTime}}</span>
+      {{/if}}
+      </div>
   {{/each}}
 
   </div>
