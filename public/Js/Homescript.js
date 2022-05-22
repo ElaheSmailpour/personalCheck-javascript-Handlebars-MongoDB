@@ -9,3 +9,9 @@ const startWork=()=>{
 const endWork=()=>{
     window.location.assign("/home/endWork")
 }
+const startPause=()=>{
+    window.location.assign("/home/startPause")
+}
+const endPause=()=>{
+    window.location.assign("/home/endPause")
+}

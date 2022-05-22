@@ -3,21 +3,13 @@ const req = require("express/lib/request");
 const moment = require("moment");
 const User = require("../models/userModel")
 const UserDayModel = require("../models/userDay")
-const { FORMAT_DAY, FORMAT_TIME, FORMAT_DATE_TIME } = require("../utils/dataTime")
+const { FORMAT_DAY, FORMAT_TIME, FORMAT_DATE_TIME,FORMAT_DATE_TIME_FULL } = require("../utils/dataTime")
 
 
 
-function generateCurrentMonthDays(month) {
-   let startDayOfMonth = moment().startOf("month")
-   let endDayOfMonth =moment().endOf("month")
-   if(month!==undefined){
-
-      startDayOfMonth.set("M",month)
-      endDayOfMonth.set("M",month)
-
-   }
-   
- 
+function generateCurrentMonthDays(date) {
+   let startDayOfMonth = moment(date,FORMAT_DAY).startOf("month")
+   let endDayOfMonth =moment(date,FORMAT_DAY).endOf("month")
 
    while (true) {
       if (startDayOfMonth.format("ddd") === "Mon")
@@ -43,9 +35,9 @@ function generateCurrentMonthDays(month) {
 
 //home
 exports.homeForm = async (req, res, next) => {
-   const month = req.query.month;
+   const date = req.query.date||moment().format(FORMAT_DAY);
    
-   const daysData = generateCurrentMonthDays(month )
+   const daysData = generateCurrentMonthDays(date )
    const findUser = await User.findById(req.session._id)
    const userDaysWork = await UserDayModel.find({ user: req.session._id })
    const daysAllInfo = [];
@@ -55,19 +47,22 @@ exports.homeForm = async (req, res, next) => {
       daysAllInfo.push({
          dayWork: day,
          startTime: founddayWork?.startTime && moment(founddayWork?.startTime, FORMAT_DATE_TIME).format(FORMAT_TIME),
-         endTime: founddayWork?.endTime && moment(founddayWork?.endTime, FORMAT_DATE_TIME).format(FORMAT_TIME)
+         endTime: founddayWork?.endTime && moment(founddayWork?.endTime, FORMAT_DATE_TIME).format(FORMAT_TIME),
+         pauseDuration : founddayWork?.pauseDuration && Math.floor(founddayWork?.pauseDuration/60)
+
       })
    }
    if (req.session?.isLogin) {
       res.render("home", {
          username: findUser.name,
           days: daysAllInfo,
-           startWorkDisabled: findUser?.status === "inWork",
-            endWordDisabled: findUser?.status === "outWork",
+           startWorkDisabled: findUser?.status !=="outWork",
+            endWorkDisabled: findUser?.status !== "inWork",
              pauseStartDisabled: findUser?.status === "outWork" || findUser?.status === "inPause",
-             currentMonth : moment().format("MMM YYYY"),
-             nextMonthNumber : moment().month()+1,
-             lastMonthNumber : moment().month()-1
+             pauseEndDisabled: findUser?.status !== "inPause",
+             currentMonth : moment(date,FORMAT_DAY).format("MMM YYYY"),
+             nextMonthNumber : moment(date,FORMAT_DAY).add(1,"M").format(FORMAT_DAY),
+             lastMonthNumber : moment(date,FORMAT_DAY).add(-1,"M").format(FORMAT_DAY),
       });
    }
    else {
@@ -112,6 +107,52 @@ exports.endWork = async (req, res) => {
       if (dayUser) {
          findUser.status = "outWork";
          dayUser.endTime = moment().format(FORMAT_DATE_TIME)
+         await dayUser.save()
+         await findUser.save();
+         res.redirect("/home")
+      }
+      else {
+         res.redirect("/home?error=find not day !")
+      }
+
+
+   }
+   else {
+      res.redirect("/user/logout")
+   }
+}
+
+module.exports.startPause = async (req,res)=>{
+   const findUser = await User.findById(req.session._id)
+
+   if (findUser) {
+      const dayUser = await UserDayModel.findOne({ day: moment().format(FORMAT_DAY), user: findUser._id })
+      if (dayUser) {
+         findUser.status = "inPause";
+         dayUser.startPause = moment().format(FORMAT_DATE_TIME_FULL)
+         await dayUser.save()
+         await findUser.save();
+         res.redirect("/home")
+      }
+      else {
+         res.redirect("/home?error=find not day !")
+      }
+
+
+   }
+   else {
+      res.redirect("/user/logout")
+   }
+}
+module.exports.endPause = async (req,res)=>{
+   const findUser = await User.findById(req.session._id)
+
+   if (findUser) {
+      const dayUser = await UserDayModel.findOne({ day: moment().format(FORMAT_DAY), user: findUser._id })
+      if (dayUser) {
+         findUser.status = "inWork";
+         dayUser.pauseDuration += Math.floor(moment.duration(moment().diff(moment(dayUser.startPause,FORMAT_DATE_TIME_FULL))).as("s"))
+         dayUser.startPause = undefined;
          await dayUser.save()
          await findUser.save();
          res.redirect("/home")

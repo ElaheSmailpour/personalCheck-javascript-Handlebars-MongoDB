@@ -7,7 +7,8 @@ const userDaySchema = new mongoose.Schema({
     day: String,
     startTime: String,
     endTime: String,
-    pauseDauration: Number
+    startPause: String,
+    pauseDuration: {type : Number , default : 0}
 
 
 

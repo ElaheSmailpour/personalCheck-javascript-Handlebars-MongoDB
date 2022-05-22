@@ -18,14 +18,14 @@
       <h3>{{username}}</h3>
     </div>
     <button {{#if startWorkDisabled}} disabled {{/if}} onclick="startWork()">start Work</button>
-    <button {{#if endWordDisabled}} disabled {{/if}}  onclick="endWork()">End Work</button>
-    <button {{#if pauseStartDisabled}} disabled {{/if}}  onclick="pauseStart()">Pause Start</button>
-    <button onclick="PauseEnd()">Pause End</button>
+    <button {{#if endWorkDisabled}} disabled {{/if}}  onclick="endWork()">End Work</button>
+    <button {{#if pauseStartDisabled}} disabled {{/if}}  onclick="startPause()">Pause Start</button>
+    <button {{#if pauseEndDisabled}} disabled {{/if}}onclick="endPause()">Pause End</button>
     
   </header>
   <div>
-    <a href="/home?month={{lastMonthNumber}}"><button><</button></a>
-    <a href="/home?month={{nextMonthNumber}}"><button>></button></a>
+    <a href="/home?date={{lastMonthNumber}}"><button><</button></a>
+    <a href="/home?date={{nextMonthNumber}}"><button>></button></a>
     <span>{{currentMonth}}</h6>
   </div>
   <div class="calender">
@@ -52,11 +52,15 @@
     </div>
     {{#each days}}
     <div class="dayCell">
+      {{#if this.startTime}}
+      <h3>employed</h3>
+      {{/if}}
       <h5>
         {{this.dayWork}}
       </h5>
       {{#if this.startTime}}
     <span>{{this.startTime}}=====> {{this.endTime}}</span>
+    <span>{{this.pauseDuration}}</span>
       {{/if}}
       </div>
   {{/each}}
