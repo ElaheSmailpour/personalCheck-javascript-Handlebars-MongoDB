@@ -6,6 +6,7 @@ const userPersonalSchema = new mongoose.Schema({
   email:String,
   status:{
     type:String,
+    default: "outWork",
     enum:["inWork","inPause","outWork"]
   }
  

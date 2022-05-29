@@ -6,7 +6,7 @@
       <ul>
         <li>my profile
           <ul>
-           
+
             <a href="/user/logout">
               <li>Logout</li>
             </a>
@@ -18,13 +18,14 @@
       <h3>{{username}}</h3>
     </div>
     <button {{#if startWorkDisabled}} disabled {{/if}} onclick="startWork()">start Work</button>
-    <button {{#if endWorkDisabled}} disabled {{/if}}  onclick="endWork()">End Work</button>
-    <button {{#if pauseStartDisabled}} disabled {{/if}}  onclick="startPause()">Pause Start</button>
+    <button {{#if endWorkDisabled}} disabled {{/if}} onclick="endWork()">End Work</button>
+    <button {{#if pauseStartDisabled}} disabled {{/if}} onclick="startPause()">Pause Start</button>
     <button {{#if pauseEndDisabled}} disabled {{/if}}onclick="endPause()">Pause End</button>
-    
+
   </header>
   <div>
-    <a href="/home?date={{lastMonthNumber}}"><button><</button></a>
+    <a href="/home?date={{lastMonthNumber}}"><button>
+        <</button></a>
     <a href="/home?date={{nextMonthNumber}}"><button>></button></a>
     <span>{{currentMonth}}</h6>
   </div>
@@ -32,26 +33,26 @@
     <div class="dayHeader">
       <h3>mon</h3>
     </div>
-     <div class="dayHeader">
+    <div class="dayHeader">
       <h3>tue</h3>
     </div>
-     <div class="dayHeader">
+    <div class="dayHeader">
       <h3>wed</h3>
     </div>
-     <div class="dayHeader">
+    <div class="dayHeader">
       <h3>thu</h3>
     </div>
-     <div class="dayHeader">
+    <div class="dayHeader">
       <h3>fri</h3>
     </div>
-     <div class="dayHeader">
+    <div class="dayHeader">
       <h3>sat</h3>
     </div>
-     <div class="dayHeader">
+    <div class="dayHeader">
       <h3>sun</h3>
     </div>
     {{#each days}}
-    <div class="dayCell">
+    <div class="dayCell" onclick="onDayClick('{{this.dayWork}}')">
       {{#if this.startTime}}
       <h3>employed</h3>
       {{/if}}
@@ -59,13 +60,41 @@
         {{this.dayWork}}
       </h5>
       {{#if this.startTime}}
-    <span>{{this.startTime}}=====> {{this.endTime}}</span>
-    <span>{{this.pauseDuration}}</span>
+      <span>{{this.startTime}}=====> {{this.endTime}}</span>
+      <span>{{this.pauseDuration}}</span>
       {{/if}}
-      </div>
-  {{/each}}
+    </div>
+    {{/each}}
 
   </div>
 
 </div>
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <form method="post" action="/home/request" enctype="multipart/form-data">
+    <span class="close">&times;</span>
+    <p>Request ...</p>
+    <select name="typeRequest">
+      <option value="sick">Sick</option>
+      <option value="holiday">Holiday</option>
+    </select>
+    <p>From - Until</p>
+    <div>
+
+      <input class="datePickerInput1" name="from"></input>
+      <input class="datePickerInput2" name="until"></input>
+    </div>
+    <p>documentation</p>
+    <input type="file" name="document" multiple />
+    <p>Description:</p>
+    <textarea name="description"></textarea>
+    <br>
+    <button>Submit</button>
+    </form>
+  </div>
+
+</div>
+<script src="https://unpkg.com/js-datepicker"></script>
 <script src="/Js/Homescript.js"></script>

@@ -3,13 +3,15 @@ const req = require("express/lib/request");
 const moment = require("moment");
 const User = require("../models/userModel")
 const UserDayModel = require("../models/userDay")
-const { FORMAT_DAY, FORMAT_TIME, FORMAT_DATE_TIME,FORMAT_DATE_TIME_FULL } = require("../utils/dataTime")
+const RequestModel = require("../models/requestModel")
+const { FORMAT_DAY, FORMAT_TIME, FORMAT_DATE_TIME, FORMAT_DATE_TIME_FULL } = require("../utils/dataTime");
+const { create } = require("connect-mongo");
 
 
 
 function generateCurrentMonthDays(date) {
-   let startDayOfMonth = moment(date,FORMAT_DAY).startOf("month")
-   let endDayOfMonth =moment(date,FORMAT_DAY).endOf("month")
+   let startDayOfMonth = moment(date, FORMAT_DAY).startOf("month")
+   let endDayOfMonth = moment(date, FORMAT_DAY).endOf("month")
 
    while (true) {
       if (startDayOfMonth.format("ddd") === "Mon")
@@ -35,9 +37,9 @@ function generateCurrentMonthDays(date) {
 
 //home
 exports.homeForm = async (req, res, next) => {
-   const date = req.query.date||moment().format(FORMAT_DAY);
-   
-   const daysData = generateCurrentMonthDays(date )
+   const date = req.query.date || moment().format(FORMAT_DAY);
+
+   const daysData = generateCurrentMonthDays(date)
    const findUser = await User.findById(req.session._id)
    const userDaysWork = await UserDayModel.find({ user: req.session._id })
    const daysAllInfo = [];
@@ -48,21 +50,23 @@ exports.homeForm = async (req, res, next) => {
          dayWork: day,
          startTime: founddayWork?.startTime && moment(founddayWork?.startTime, FORMAT_DATE_TIME).format(FORMAT_TIME),
          endTime: founddayWork?.endTime && moment(founddayWork?.endTime, FORMAT_DATE_TIME).format(FORMAT_TIME),
-         pauseDuration : founddayWork?.pauseDuration && Math.floor(founddayWork?.pauseDuration/60)
+         pauseDuration: founddayWork?.pauseDuration && Math.floor(founddayWork?.pauseDuration / 60)
 
       })
    }
    if (req.session?.isLogin) {
       res.render("home", {
          username: findUser.name,
-          days: daysAllInfo,
-           startWorkDisabled: findUser?.status !=="outWork",
-            endWorkDisabled: findUser?.status !== "inWork",
-             pauseStartDisabled: findUser?.status === "outWork" || findUser?.status === "inPause",
-             pauseEndDisabled: findUser?.status !== "inPause",
-             currentMonth : moment(date,FORMAT_DAY).format("MMM YYYY"),
-             nextMonthNumber : moment(date,FORMAT_DAY).add(1,"M").format(FORMAT_DAY),
-             lastMonthNumber : moment(date,FORMAT_DAY).add(-1,"M").format(FORMAT_DAY),
+         days: daysAllInfo,
+         startWorkDisabled: findUser?.status !== "outWork",
+         //eli // startWorkDisabled: findUser?.status ==="outWork" || findUser?.status === "inWork",
+         endWorkDisabled: findUser?.status !== "inWork",
+         pauseStartDisabled: findUser?.status === "outWork" || findUser?.status === "inPause",
+
+         pauseEndDisabled: findUser?.status !== "inPause",
+         currentMonth: moment(date, FORMAT_DAY).format("MMM YYYY"),
+         nextMonthNumber: moment(date, FORMAT_DAY).add(1, "M").format(FORMAT_DAY),
+         lastMonthNumber: moment(date, FORMAT_DAY).add(-1, "M").format(FORMAT_DAY),
       });
    }
    else {
@@ -122,7 +126,7 @@ exports.endWork = async (req, res) => {
    }
 }
 
-module.exports.startPause = async (req,res)=>{
+module.exports.startPause = async (req, res) => {
    const findUser = await User.findById(req.session._id)
 
    if (findUser) {
@@ -166,4 +170,15 @@ module.exports.endPause = async (req,res)=>{
    else {
       res.redirect("/user/logout")
    }
+}
+//request 
+module.exports.request = async (req, res) => {
+   const body = req.body
+   console.log("files=",req.files)
+   const createRequest = await RequestModel.create({
+      typeRequest: body.typeRequest, from: moment(body.from,"D.M.YYYY").format(FORMAT_DAY), until:  moment(body.until,"D.M.YYYY").format(FORMAT_DAY),
+      description: body.description, user: req.session._id,
+      documentsPicture:req.files.map(item=>item.filename)
+   })
+   res.redirect("/home")
 }
